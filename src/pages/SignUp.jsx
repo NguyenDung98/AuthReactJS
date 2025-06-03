@@ -66,22 +66,21 @@ const SignUp = () => {
   return (
     <Container fluid className="vh-100">
       <Row className="h-100">
-        {/* Left Side (Image or Blank) */}
+        {/* Left Side */}
         <Col
-          md="6"
+          md="8"
           className="d-none d-md-flex align-items-center justify-content-center bg-light"
         >
-          {/* Optional SVG or illustration */}
           <img
             src="/undraw_chef_yoa7.svg"
             alt="illustration"
-            style={{ maxWidth: "60%", height: "auto" }}
+            style={{ maxWidth: "60%", height: "70%" }}
           />
         </Col>
 
         {/* Right Side (Form) */}
         <Col
-          md="6"
+          md="4"
           className="d-flex align-items-center justify-content-center"
         >
           <div className="w-75">
@@ -164,7 +163,7 @@ const SignUp = () => {
                   required
                 />
                 <Label check htmlFor="terms">
-                  I agree to <a href="#">privacy policy & terms</a>
+                  I agree to <a href="#terms" className="text-decoration-none">privacy policy & terms</a>
                 </Label>
               </FormGroup>
 
@@ -179,7 +178,7 @@ const SignUp = () => {
 
               <div className="text-center">
                 <small className="text-muted">
-                  Already have an account? <a href="/login">Sign in instead</a>
+                  Already have an account? <a href="/login" className="text-decoration-none">Sign in instead</a>
                 </small>
               </div>
             </Form>

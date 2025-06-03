@@ -1,0 +1,5 @@
+.left-dropdown {
+  position: absolute !important;
+  top: 50px !important;
+  left: -100px !important;
+}
