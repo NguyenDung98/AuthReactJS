@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import SignUp from "./pages/SignUp";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import SignUp from "../pages/SignUp";
+import Login from "../pages/Login";
+import Dashboard from "../pages/Dashboard";
 
 const PreAuthRoute = ({ children }) => {
   const token = localStorage.getItem("token");
