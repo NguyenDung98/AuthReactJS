@@ -53,10 +53,10 @@ This is a simple authentication demo built with ReactJS. It demonstrates user re
 ## Demo Screenshots
 
 ### Sign Up Page
-![Sign Up Demo](./public/signup-demo.jpg)
+![Sign Up Demo](./public/screenshots//signup-1.jpg)
 
 ### Login Page
-![Login Demo](./public/login-demo.jpg)
+![Login Demo](./public/screenshots//login-1.jpg)
 
 ### Dashboard
-![Dashboard Demo](./public/dashboard-demo.jpg)
+![Dashboard Demo](./public/screenshots//dashboard-1.jpg)
