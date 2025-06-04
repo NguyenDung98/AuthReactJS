@@ -10,6 +10,7 @@ import {
   FormFeedback,
 } from "reactstrap";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const SignUp = () => {
     terms: false,
   });
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,13 +31,61 @@ const SignUp = () => {
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = validateForm();
     if (Object.keys(newErrors).length === 0) {
       // Submit form data to the server or perform any other action
       console.log("Form submitted successfully:", formData);
+
+      try {
+        const signupResponse = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (signupResponse.ok) {
+          await signupResponse.json();
+
+          // Login the user
+          const loginResponse = await fetch("/api/signin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: formData.email,
+              password: formData.password,
+            }),
+          });
+          if (loginResponse.ok) {
+            const loginData = await loginResponse.json();
+
+            // Redirect to dashboard or perform any other action
+            localStorage.setItem("token", loginData.token);
+            localStorage.setItem("refreshToken", loginData.refreshToken);
+            localStorage.setItem("user", JSON.stringify(loginData.user));
+            navigate("/dashboard");
+          } else {
+            const errorData = await loginResponse.json();
+            console.error("Login failed:", errorData);
+            alert("Login failed. Please check your credentials and try again.");
+          }
+        } else {
+          const errorData = await signupResponse.json();
+          console.error("Signup failed:", errorData);
+          alert(
+            "Signup failed. Please check your details and try again."
+          );
+        }
+      } catch (error) {
+        console.error("Error during signup:", error);
+        alert("An error occurred during signup. Please try again later.");
+      }
     }
   };
 
@@ -43,7 +93,7 @@ const SignUp = () => {
     const newErrors = {};
     if (!formData.firstname) newErrors.firstname = "Firstname is required";
     if (!formData.lastname) newErrors.lastname = "Lastname is required";
-    
+
     if (!formData.email) newErrors.email = "Email is required";
     else if (
       !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
@@ -54,7 +104,9 @@ const SignUp = () => {
     if (!formData.password) newErrors.password = "Password is required";
     else if (formData.password.length < 6) {
       newErrors.password = "Password must be between 6 and 18 characters long";
-    } else if (!formData.password.match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/)) {
+    } else if (
+      !formData.password.match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/)
+    ) {
       newErrors.password =
         "Password must contain at least one letter, one number, and one special character";
     }
@@ -91,7 +143,9 @@ const SignUp = () => {
 
             <Form onSubmit={onSubmit}>
               <FormGroup>
-                <Label for="firstname">Firstname<span className="text-danger">*</span></Label>
+                <Label for="firstname">
+                  Firstname<span className="text-danger">*</span>
+                </Label>
                 <Input
                   id="firstname"
                   name="firstname"
@@ -106,7 +160,9 @@ const SignUp = () => {
                 )}
               </FormGroup>
               <FormGroup>
-                <Label for="lastname">Lastname<span className="text-danger">*</span></Label>
+                <Label for="lastname">
+                  Lastname<span className="text-danger">*</span>
+                </Label>
                 <Input
                   id="lastname"
                   name="lastname"
@@ -122,7 +178,9 @@ const SignUp = () => {
               </FormGroup>
 
               <FormGroup>
-                <Label for="email">Email<span className="text-danger">*</span></Label>
+                <Label for="email">
+                  Email<span className="text-danger">*</span>
+                </Label>
                 <Input
                   id="email"
                   name="email"
@@ -137,7 +195,9 @@ const SignUp = () => {
               </FormGroup>
 
               <FormGroup>
-                <Label for="password">Password<span className="text-danger">*</span></Label>
+                <Label for="password">
+                  Password<span className="text-danger">*</span>
+                </Label>
                 <Input
                   id="password"
                   name="password"
@@ -163,7 +223,10 @@ const SignUp = () => {
                   required
                 />
                 <Label check htmlFor="terms">
-                  I agree to <a href="#terms" className="text-decoration-none">privacy policy & terms</a>
+                  I agree to{" "}
+                  <a href="#terms" className="text-decoration-none">
+                    privacy policy & terms
+                  </a>
                 </Label>
               </FormGroup>
 
@@ -178,7 +241,10 @@ const SignUp = () => {
 
               <div className="text-center">
                 <small className="text-muted">
-                  Already have an account? <a href="/login" className="text-decoration-none">Sign in instead</a>
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-decoration-none">
+                    Sign in instead
+                  </Link>
                 </small>
               </div>
             </Form>

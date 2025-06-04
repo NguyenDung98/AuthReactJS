@@ -10,6 +10,7 @@ import {
   FormFeedback,
 } from "reactstrap";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const Login = () => {
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,13 +29,42 @@ const Login = () => {
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = validateForm();
     if (Object.keys(newErrors).length === 0) {
       // Submit form data to the server or perform any other action
       console.log("Form submitted successfully:", formData);
+
+      try {
+        const loginResponse = await fetch("/api/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        if (loginResponse.ok) {
+            const loginData = await loginResponse.json();
+
+            // Redirect to dashboard or perform any other action
+            localStorage.setItem("token", loginData.token);
+            localStorage.setItem("refreshToken", loginData.refreshToken);
+            localStorage.setItem("user", JSON.stringify(loginData.user));
+            navigate("/dashboard");
+          } else {  
+            const errorData = await loginResponse.json();
+            console.error("Login failed:", errorData);
+            alert("Login failed. Please check your credentials and try again.");
+          }
+      } catch (error) {
+        console.error("Error during login:", error);
+      }
     }
   };
 
@@ -56,12 +87,11 @@ const Login = () => {
   return (
     <Container fluid className="vh-100">
       <Row className="h-100">
-        {/* Left Side (Image or Blank) */}
+        {/* Left Side */}
         <Col
           md="8"
           className="d-none d-md-flex align-items-center justify-content-center bg-light"
         >
-          {/* Optional SVG or illustration */}
           <img
             src="/undraw_chef_yoa7.svg"
             alt="illustration"
@@ -150,7 +180,7 @@ const Login = () => {
 
               <div className="text-center">
                 <small className="text-muted">
-                  New on our platform ? <a href="/signup" className="text-decoration-none">Create an account</a>
+                  New on our platform ? <Link to="/signup" className="text-decoration-none">Create an account</Link>
                 </small>
               </div>
             </Form>

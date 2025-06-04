@@ -10,18 +10,40 @@ import {
   NavItem,
 } from "reactstrap";
 import "./Dashboard.css";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard = (args) => {
+const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggle = () => setDropdownOpen((prev) => !prev);
+
+  const onLogout = async () => {
+    try {
+      // Call the API to sign out the user
+      await fetch("/api/signout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      localStorage.clear();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   return (
     <Container fluid className="vh-100">
       <Navbar color="light" light expand="md" className="px-4 shadow-sm">
         <Nav className="ms-auto d-flex align-items-center" navbar>
           <NavItem className="me-3 text-end">
-            <div className="fw-bold">John Doe</div>
+            <div className="fw-bold">
+              {JSON.parse(localStorage.getItem("user")).displayName}
+            </div>
             <small className="text-success">Available</small>
           </NavItem>
 
@@ -40,11 +62,10 @@ const Dashboard = (args) => {
                 height={36}
                 style={{ cursor: "pointer" }}
               />
+              <div className="online-indicator" />
             </DropdownToggle>
             <DropdownMenu className="left-dropdown text-end min-width-200">
-              <DropdownItem onClick={() => alert("Logout clicked")}>
-                Logout ⏻
-              </DropdownItem>
+              <DropdownItem onClick={onLogout}>Logout ⏻</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </Nav>
